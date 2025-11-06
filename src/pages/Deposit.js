@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import ValidatedInput, { validations } from '../components/ValidatedInput';
+import InteractiveButton from '../components/InteractiveButton';
+import ProviderSelector from '../components/ProviderSelector';
 import toast from 'react-hot-toast';
 
 const Deposit = () => {
@@ -10,10 +13,10 @@ const Deposit = () => {
   const [loading, setLoading] = useState(false);
 
   const providers = [
-    { id: 'orange', name: 'Orange Money', color: 'orange' },
-    { id: 'mtn', name: 'MTN Mobile Money', color: 'yellow' },
-    { id: 'wave', name: 'Wave', color: 'blue' },
-    { id: 'moov', name: 'Moov Money', color: 'green' }
+    { id: 'orange', name: 'Orange Money', available: true, fees: '0%' },
+    { id: 'mtn', name: 'MTN Mobile Money', available: true, fees: '1%' },
+    { id: 'wave', name: 'Wave', available: true, fees: '0.5%' },
+    { id: 'moov', name: 'Moov Money', available: false, fees: '1%' }
   ];
 
   const handleDeposit = async (e) => {
@@ -45,57 +48,44 @@ const Deposit = () => {
       
       <div className="bg-white rounded-lg shadow p-6">
         <form onSubmit={handleDeposit} className="space-y-6">
+          <ValidatedInput
+            label="Montant (F CFA)"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Minimum 1000 F"
+            validation={(value) => validations.amount(value, 1000, 1000000)}
+            required
+          />
+
           <div>
-            <label className="block text-sm font-medium mb-2">Montant (F CFA)</label>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Minimum 1000 F"
-              min="1000"
-              className="w-full p-3 border rounded-lg"
-              required
+            <label className="block text-sm font-medium mb-4">Opérateur Mobile Money</label>
+            <ProviderSelector
+              providers={providers}
+              selected={provider}
+              onSelect={setProvider}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Opérateur</label>
-            <div className="grid grid-cols-2 gap-3">
-              {providers.map((p) => (
-                <label key={p.id} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="provider"
-                    value={p.id}
-                    checked={provider === p.id}
-                    onChange={(e) => setProvider(e.target.value)}
-                    className="mr-3"
-                  />
-                  <span>{p.name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <ValidatedInput
+            label="Numéro de téléphone"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+225 XX XX XX XX"
+            validation={validations.phone}
+            required
+          />
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Numéro de téléphone</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+225 XX XX XX XX"
-              className="w-full p-3 border rounded-lg"
-              required
-            />
-          </div>
-
-          <button
+          <InteractiveButton
             type="submit"
-            disabled={loading || !amount || parseInt(amount) < 1000}
-            className="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 disabled:opacity-50"
+            loading={loading}
+            disabled={!amount || parseInt(amount) < 1000 || !phone}
+            className="w-full"
+            size="lg"
           >
-            {loading ? 'Traitement...' : `Déposer ${amount ? amount + ' F' : ''}`}
-          </button>
+            Déposer {amount ? `${amount} F` : ''}
+          </InteractiveButton>
         </form>
 
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">

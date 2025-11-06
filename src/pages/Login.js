@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Phone, Lock, Eye, EyeOff } from 'lucide-react';
+import { Phone, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ValidatedInput, { validations } from '../components/ValidatedInput';
+import InteractiveButton from '../components/InteractiveButton';
 
 const Login = () => {
   const { login } = useAuth();
@@ -10,7 +12,7 @@ const Login = () => {
     phone: '',
     password: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -48,67 +50,35 @@ const Login = () => {
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion</h2>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Téléphone */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Numéro de téléphone
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+229 XX XX XX XX"
-                  className="input-field pl-10"
-                  required
-                />
-              </div>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <ValidatedInput
+              label="Numéro de téléphone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              placeholder="+229 XX XX XX XX"
+              validation={validations.phone}
+              required
+            />
 
-            {/* Mot de passe */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mot de passe
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Votre mot de passe"
-                  className="input-field pl-10 pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
+            <ValidatedInput
+              label="Mot de passe"
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              placeholder="Votre mot de passe"
+              required
+            />
 
-            {/* Bouton de connexion */}
-            <button
+            <InteractiveButton
               type="submit"
-              disabled={loading}
-              className="btn-primary w-full"
+              loading={loading}
+              disabled={!formData.phone || !formData.password}
+              className="w-full"
+              size="lg"
             >
-              {loading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Connexion...</span>
-                </div>
-              ) : (
-                'Se connecter'
-              )}
-            </button>
+              Se connecter
+            </InteractiveButton>
           </form>
 
           {/* Lien d'inscription */}
