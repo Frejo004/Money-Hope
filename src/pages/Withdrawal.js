@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const Withdrawal = () => {
   const { user, requestWithdrawal } = useAuth(); // Supposons que requestWithdrawal existe dans le contexte
+  const navigate = useNavigate();
   const [amount, setAmount] = useState('');
   const [provider, setProvider] = useState('orange');
   const [phone, setPhone] = useState('');
@@ -16,8 +18,22 @@ const Withdrawal = () => {
     { id: 'moov', name: 'Moov Money', color: 'green' }
   ];
 
+  useEffect(() => {
+    // Vérifie le statut KYC au chargement de la page
+    if (user && user.kycStatus !== 'verified') {
+      toast.info('Veuillez vérifier votre identité pour pouvoir effectuer un retrait.', {
+        icon: 'ℹ️',
+      });
+      navigate('/kyc');
+    }
+  }, [user, navigate]);
+
   const handleWithdrawal = async (e) => {
     e.preventDefault();
+    if (user?.kycStatus !== 'verified') {
+      toast.error('Votre identité doit être vérifiée pour effectuer un retrait.');
+      return;
+    }
     const withdrawAmount = parseInt(amount);
 
     if (withdrawAmount < 3000) {
@@ -43,6 +59,11 @@ const Withdrawal = () => {
       setLoading(false);
     }
   };
+
+  // Ne rend le contenu que si l'utilisateur est vérifié pour éviter un flash de l'interface
+  if (user?.kycStatus !== 'verified') {
+    return null; // Ou un spinner de chargement
+  }
 
   return (
     <div className="p-6">

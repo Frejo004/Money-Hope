@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { Shield, ChevronRight } from 'lucide-react';
 
 const Profile = () => {
   const { user, logout, updateUserProfile } = useAuth(); // Supposons que updateUserProfile existe dans le contexte
@@ -26,6 +28,20 @@ const Profile = () => {
     }
   };
 
+  const getKycStatusBadge = () => {
+    const status = user?.kycStatus;
+    switch (status) {
+      case 'verified':
+        return <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800">Vérifié</span>;
+      case 'pending':
+        return <span className="text-xs font-medium px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">En attente</span>;
+      case 'rejected':
+        return <span className="text-xs font-medium px-2 py-1 rounded-full bg-red-100 text-red-800">Rejeté</span>;
+      default:
+        return <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-800">Non vérifié</span>;
+    }
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Mon Profil</h1>
@@ -34,7 +50,7 @@ const Profile = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Informations personnelles</h2>
           <button
-            onClick={() => setEditing(!editing)}
+            onClick={() => setEditing(prev => !prev)}
             className="text-blue-500 hover:text-blue-600"
           >
             {editing ? 'Annuler' : 'Modifier'}
@@ -96,6 +112,20 @@ const Profile = () => {
             <div className="text-sm text-gray-600">Gains totaux</div>
           </div>
         </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4">Compte & Sécurité</h2>
+        <Link to="/kyc" className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors">
+          <div className="flex items-center space-x-4">
+            <Shield className="w-6 h-6 text-gray-500" />
+            <div>
+              <p className="font-semibold">Vérification d'identité (KYC)</p>
+              <div className="mt-1">{getKycStatusBadge()}</div>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-gray-400" />
+        </Link>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
