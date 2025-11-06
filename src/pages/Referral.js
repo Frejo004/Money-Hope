@@ -1,12 +1,13 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Referral = () => {
   const { user } = useAuth();
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(user?.referralCode || '');
-    alert('Code copié !');
+    toast.success('Code de parrainage copié !');
   };
 
   return (

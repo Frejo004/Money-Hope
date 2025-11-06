@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Deposit = () => {
+  const { requestDeposit } = useAuth(); // Supposons que requestDeposit existe dans le contexte
   const [amount, setAmount] = useState('');
   const [provider, setProvider] = useState('orange');
   const [phone, setPhone] = useState('');
@@ -15,16 +18,25 @@ const Deposit = () => {
 
   const handleDeposit = async (e) => {
     e.preventDefault();
-    if (parseInt(amount) < 1000) {
-      alert('Le montant minimum est de 1000 F');
+    const depositAmount = parseInt(amount);
+
+    if (depositAmount < 1000) {
+      toast.error('Le montant minimum de dépôt est de 1000 F.');
       return;
     }
+
     setLoading(true);
-    // TODO: Implement deposit logic
-    setTimeout(() => {
-      alert('Dépôt initié. Suivez les instructions sur votre téléphone.');
+    try {
+      // La fonction requestDeposit devrait gérer l'appel API
+      await requestDeposit({ amount: depositAmount, provider, phone });
+      toast.success('Dépôt initié. Suivez les instructions sur votre téléphone.');
+      setAmount('');
+      setPhone('');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur lors de la demande de dépôt.');
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -79,10 +91,10 @@ const Deposit = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !amount || parseInt(amount) < 1000}
             className="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 disabled:opacity-50"
           >
-            {loading ? 'Traitement...' : `Déposer ${amount} F`}
+            {loading ? 'Traitement...' : `Déposer ${amount ? amount + ' F' : ''}`}
           </button>
         </form>
 

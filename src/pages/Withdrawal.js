@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Withdrawal = () => {
-  const { user } = useAuth();
+  const { user, requestWithdrawal } = useAuth(); // Supposons que requestWithdrawal existe dans le contexte
   const [amount, setAmount] = useState('');
   const [provider, setProvider] = useState('orange');
   const [phone, setPhone] = useState('');
@@ -18,23 +19,29 @@ const Withdrawal = () => {
   const handleWithdrawal = async (e) => {
     e.preventDefault();
     const withdrawAmount = parseInt(amount);
-    
+
     if (withdrawAmount < 3000) {
-      alert('Le montant minimum de retrait est de 3000 F');
+      toast.error('Le montant minimum de retrait est de 3000 F.');
       return;
     }
-    
+
     if (withdrawAmount > (user?.balance || 0)) {
-      alert('Solde insuffisant');
+      toast.error('Votre solde est insuffisant pour ce retrait.');
       return;
     }
-    
+
     setLoading(true);
-    // TODO: Implement withdrawal logic
-    setTimeout(() => {
-      alert('Demande de retrait envoyée. Traitement sous 24h.');
+    try {
+      // La fonction requestWithdrawal devrait gérer l'appel API et la mise à jour du contexte
+      await requestWithdrawal({ amount: withdrawAmount, provider, phone });
+      toast.success('Demande de retrait envoyée. Elle sera traitée sous 24h.');
+      setAmount('');
+      setPhone('');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur lors de la demande de retrait.');
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return (

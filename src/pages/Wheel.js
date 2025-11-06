@@ -26,14 +26,21 @@ const Wheel = () => {
     if (isSpinning || user.balance < 200) return;
 
     setIsSpinning(true);
+    setLastPrize(null);
     
     try {
+      // Le backend décide du gain et le retourne
       const response = await axios.post('/wheel/spin');
-      const { prize, newBalance } = response.data.result;
+      const { prize, newBalance, prizeIndex } = response.data.result; // Supposons que l'API retourne l'index du gain
       
+      // Déterminer la rotation pour pointer vers le bon segment
+      const segmentAngle = 360 / wheelPrizes.length;
+      const randomOffset = (Math.random() - 0.5) * segmentAngle * 0.8; // Pour ne pas tomber pile sur la ligne
+      const prizeAngle = (prizeIndex * segmentAngle) + randomOffset;
+
       // Animation de rotation
-      const spins = 5 + Math.random() * 5; // 5-10 tours
-      const finalRotation = rotation + (spins * 360);
+      const spins = 5; // Nombre de tours complets
+      const finalRotation = rotation + (spins * 360) - (rotation % 360) + prizeAngle + 360; // +360 pour assurer une rotation positive
       setRotation(finalRotation);
       
       // Attendre la fin de l'animation

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -17,14 +18,14 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
+      toast.error('Les mots de passe ne correspondent pas.');
       return;
     }
     setLoading(true);
     try {
       await register(formData);
     } catch (error) {
-      alert('Erreur lors de l\'inscription');
+      toast.error(error.response?.data?.message || 'Erreur lors de l\'inscription.');
     }
     setLoading(false);
   };
