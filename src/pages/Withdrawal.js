@@ -21,7 +21,7 @@ const Withdrawal = () => {
   useEffect(() => {
     // Vérifie le statut KYC au chargement de la page
     if (user && user.kycStatus !== 'verified') {
-      toast.info('Veuillez vérifier votre identité pour pouvoir effectuer un retrait.', {
+      toast('Veuillez vérifier votre identité pour pouvoir effectuer un retrait.', {
         icon: 'ℹ️',
       });
       navigate('/kyc');
