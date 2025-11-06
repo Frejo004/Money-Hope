@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Play, CheckCircle, Clock, Gift } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { SkeletonList } from '../components/Skeleton';
+import LoadingButton from '../components/LoadingButton';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -76,8 +78,20 @@ const Tasks = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+      <div className="p-4 space-y-6">
+        <div className="text-center">
+          <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-2 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-48 mx-auto animate-pulse"></div>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+          <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+          <div className="flex justify-between">
+            <div className="h-3 bg-gray-200 rounded w-8"></div>
+            <div className="h-3 bg-gray-200 rounded w-16"></div>
+          </div>
+        </div>
+        <SkeletonList items={4} />
       </div>
     );
   }
@@ -141,28 +155,19 @@ const Tasks = () => {
                   </div>
                 </div>
                 
-                <button
+                <LoadingButton
                   onClick={() => completeTask(task.id)}
-                  disabled={isCompleted || isInProgress}
-                  className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                  loading={isInProgress}
+                  disabled={isCompleted}
+                  loadingText="En cours..."
+                  className={`px-6 py-2 rounded-lg font-medium ${
                     isCompleted 
                       ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : isInProgress
-                      ? 'bg-orange-500 text-white cursor-not-allowed'
-                      : 'bg-green-500 hover:bg-green-600 text-white transform hover:scale-105'
+                      : 'bg-green-500 hover:bg-green-600 text-white'
                   }`}
                 >
-                  {isInProgress ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>En cours...</span>
-                    </div>
-                  ) : isCompleted ? (
-                    'Terminé'
-                  ) : (
-                    'Commencer'
-                  )}
-                </button>
+                  {isCompleted ? 'Terminé' : 'Commencer'}
+                </LoadingButton>
               </div>
               
               {/* Barre de progression */}

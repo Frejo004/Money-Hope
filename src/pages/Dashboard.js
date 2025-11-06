@@ -16,6 +16,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { SkeletonBalance, SkeletonStats, SkeletonList } from '../components/Skeleton';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -71,6 +72,19 @@ const Dashboard = () => {
   ];
 
   const dailyProgress = Math.min((stats.dailyEarnings / 1500) * 100, 100);
+
+  if (loading) {
+    return (
+      <div className="p-4 space-y-6 bg-gray-50 min-h-screen">
+        <SkeletonBalance />
+        <SkeletonStats />
+        <div className="space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+          <SkeletonList items={3} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 space-y-6 bg-gray-50 min-h-screen">

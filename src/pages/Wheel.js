@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Coins, RotateCcw, Trophy } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { SkeletonWheel } from '../components/Skeleton';
+import LoadingButton from '../components/LoadingButton';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -128,21 +130,16 @@ const Wheel = () => {
 
       {/* Bouton de jeu */}
       <div className="text-center">
-        <button
+        <LoadingButton
           onClick={spinWheel}
-          disabled={isSpinning || user?.balance < 200}
-          className={`btn-primary w-full max-w-xs ${
-            isSpinning || user?.balance < 200 
-              ? 'opacity-50 cursor-not-allowed' 
-              : 'pulse-glow'
+          loading={isSpinning}
+          disabled={user?.balance < 200}
+          loadingText="Rotation..."
+          className={`w-full max-w-xs py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold text-lg shadow-lg ${
+            user?.balance < 200 ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-xl'
           }`}
         >
-          {isSpinning ? (
-            <span className="flex items-center justify-center space-x-2">
-              <RotateCcw className="w-5 h-5 animate-spin" />
-              <span>Rotation...</span>
-            </span>
-          ) : user?.balance < 200 ? (
+          {user?.balance < 200 ? (
             'Solde insuffisant'
           ) : (
             <span className="flex items-center justify-center space-x-2">
@@ -150,7 +147,7 @@ const Wheel = () => {
               <span>Jouer (200 F)</span>
             </span>
           )}
-        </button>
+        </LoadingButton>
       </div>
 
       {/* Dernier gain */}
